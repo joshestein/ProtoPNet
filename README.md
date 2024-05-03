@@ -1,0 +1,1 @@
+This is a re-implementation of ProtoPNet. The original paper is at https://arxiv.org/pdf/1806.10574.
