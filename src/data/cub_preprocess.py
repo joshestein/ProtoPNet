@@ -6,6 +6,7 @@ from PIL import Image
 
 def get_test_train_split_ids(data_dir: Path) -> (list[int], list[int]):
     train_ids, test_ids = [], []
+
     with open(data_dir / "train_test_split.txt", "r", encoding="UTF-8") as file:
         while line := file.readline():
             image_id, is_training_image = line.rstrip().split(" ")
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--output_dir",
-        help="Output dir where preprocessed data should be saved.",
+        help="Output dir where preprocessed data should be saved. Defaults to `data_dir`.",
         required=False,
     )
     args = parser.parse_args()
