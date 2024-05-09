@@ -13,6 +13,10 @@ def preprocess(data):
     return data
 
 
+def get_model_output_shape(model, expected_input_shape):
+    return model(torch.rand(expected_input_shape)).data.shape
+
+
 class ProtoPNet(nn.Module):
     def __init__(self, base_model="vgg16", output_channels=128, prototypes_per_class=10, num_output_classes=200):
         """
@@ -24,8 +28,11 @@ class ProtoPNet(nn.Module):
         self.conv_net = torch.hub.load("pytorch/vision:v0.10.0", base_model, pretrained=True)
         del self.conv_net.classifier  # Remove classification layers
 
+        # TODO: support other base models, conditionally construct `expected input_shape`
+        conv_output_channels = get_model_output_shape(self.conv_net, (1, 3, 224, 224))[1]
+
         self.additional_layers = nn.Sequential(
-            nn.Conv2d(512, output_channels, 1),  # First 1x1 convolution
+            nn.Conv2d(conv_output_channels, output_channels, 1),  # First 1x1 convolution
             nn.ReLU(inplace=True),
             nn.Conv2d(output_channels, output_channels, 1),  # Second 1x1 convolution
             nn.Sigmoid(),
