@@ -50,15 +50,15 @@ def crop_images(train_ids: list[int], data_dir: Path, output_dir: Path):
             image.save(path / image_paths[image_id].name)
 
 
-def create_augmentations(dir: Path):
+def create_augmentations(root_dir: Path):
     """Augments the input dir images with a series of rotations, skews and shears. Copied from
     https://github.com/cfchen-duke/ProtoPNet/blob/81bf2b70cb60e4f36e25e8be386eb616b7459321/img_aug.py"""
 
     # TODO: rotations can (and are) breaking.
     # See https://github.com/mdbloice/Augmentor/pull/258
 
-    input_dir = dir / "cub200_cropped" / "train_cropped"
-    output_dir = dir / "cub200_cropped" / "train_cropped_augmented"
+    input_dir = root_dir / "cub200_cropped" / "train_cropped"
+    output_dir = root_dir / "cub200_cropped" / "train_cropped_augmented"
 
     os.makedirs(output_dir, exist_ok=True)
 
