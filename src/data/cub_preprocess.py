@@ -30,8 +30,7 @@ def get_image_paths(data_dir: Path) -> dict[int, Path]:
     return image_paths
 
 
-def crop_images(data_dir: Path, output_dir: Path):
-    train_ids, test_ids = get_test_train_split_ids(data_dir)
+def crop_images(train_ids: list[int], data_dir: Path, output_dir: Path):
     image_paths = get_image_paths(data_dir)
 
     os.makedirs(output_dir, exist_ok=True)
@@ -88,7 +87,8 @@ def create_augmentations(dir: Path):
 
 
 def run_preprocessing(data_dir: Path, output_dir: Path):
-    crop_images(data_dir, output_dir)
+    train_ids, _ = get_test_train_split_ids(data_dir)
+    crop_images(train_ids, data_dir, output_dir)
     create_augmentations(output_dir)
 
 
