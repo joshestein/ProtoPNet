@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import Augmentor
 from PIL import Image
 
 
@@ -50,16 +51,54 @@ def crop_images(data_dir: Path, output_dir: Path):
             image.save(path / image_paths[image_id].name)
 
 
+def create_augmentations(dir: Path):
+    """Augments the input dir images with a series of rotations, skews and shears. Copied from
+    https://github.com/cfchen-duke/ProtoPNet/blob/81bf2b70cb60e4f36e25e8be386eb616b7459321/img_aug.py"""
+
+    # TODO: rotations can (and are) breaking.
+    # See https://github.com/mdbloice/Augmentor/pull/258
+
+    input_dir = dir / "cub200_cropped" / "train_cropped"
+    output_dir = dir / "cub200_cropped" / "train_cropped_augmented"
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Rotation
+    p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
+    p.rotate(probability=1, max_left_rotation=15, max_right_rotation=15)
+    p.flip_left_right(probability=0.5)
+    for i in range(10):
+        p.process()
+    del p
+
+    # Skew
+    p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
+    p.skew(probability=1, magnitude=0.2)  # max 45 degrees
+    p.flip_left_right(probability=0.5)
+    for i in range(10):
+        p.process()
+    del p
+
+    # Shear
+    p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
+    p.shear(probability=1, max_shear_left=10, max_shear_right=10)
+    p.flip_left_right(probability=0.5)
+    for i in range(10):
+        p.process()
+
+
 def run_preprocessing(data_dir: Path, output_dir: Path):
     crop_images(data_dir, output_dir)
+    create_augmentations(output_dir)
 
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
 
     parser = ArgumentParser(
-        description="Preprocessor for CUB-200-2011 dataset. Images are split into train/test directories. Training "
-        "images are augmented according to the original ProtoPNet paper."
+        description="Preprocessor for CUB-200-2011 dataset. Images are split into train/test directories and cropped "
+        "according to the provided bounding boxes. Training images are augmented according to the original ProtoPNet "
+        "paper."
     )
     parser.add_argument(
         "-d",
