@@ -55,9 +55,9 @@ def run_preprocessing(data_dir: Path, output_dir: Path):
 
 
 if __name__ == "__main__":
-    import argparse
+    from argparse import ArgumentParser
 
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description="Preprocessor for CUB-200-2011 dataset. Images are split into train/test directories. Training "
         "images are augmented according to the original ProtoPNet paper."
     )
