@@ -39,7 +39,7 @@ class ProtoPNet(nn.Module):
         )
 
         # TODO: Xavier initialisation
-        self.prototypes = nn.Parameter(torch.randn(prototypes_per_class, num_output_classes, 1, 1))
+        self.prototypes = nn.Parameter(torch.randn(prototypes_per_class, output_channels, 1, 1))
         self.fully_connected = nn.Linear(prototypes_per_class, num_output_classes, bias=False)
 
     def forward(self, x):
