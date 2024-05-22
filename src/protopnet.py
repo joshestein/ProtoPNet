@@ -38,9 +38,13 @@ class ProtoPNet(nn.Module):
             nn.Sigmoid(),
         )
 
+        num_prototypes = prototypes_per_class * num_output_classes
+        # Each class has a onehot prototype representation
+        self.prototype_onehot_class_representation = torch.zeros((num_output_classes, num_prototypes))
+
         # TODO: Xavier initialisation
-        self.prototypes = nn.Parameter(torch.randn(prototypes_per_class, output_channels, 1, 1))
-        self.fully_connected = nn.Linear(prototypes_per_class, num_output_classes, bias=False)
+        self.prototypes = nn.Parameter(torch.randn(num_prototypes, output_channels, 1, 1))
+        self.fully_connected = nn.Linear(num_prototypes, num_output_classes, bias=False)
 
     def forward(self, x):
         x = self.pretrained_conv_net(x)
