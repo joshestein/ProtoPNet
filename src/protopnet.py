@@ -2,17 +2,6 @@ import torch
 from torch import nn
 
 
-def preprocess(data):
-    # https://pytorch.org/hub/pytorch_vision_vgg/
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
-
-    for d in data:
-        d = (d - mean) / std
-
-    return data
-
-
 def get_model_output_shape(model, expected_input_shape):
     return model(torch.rand(expected_input_shape)).data.shape
 
