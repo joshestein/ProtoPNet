@@ -16,13 +16,15 @@ class ProtoPNet(nn.Module):
         """
         super().__init__()
 
-        del self.pretrained_conv_net.classifier  # Remove classification layers
         self.pretrained_conv_net = torch.hub.load(
             "pytorch/vision:v0.10.0", base_model, weights=VGG16_Weights.IMAGENET1K_V1
         )
 
         # TODO: support other base models, conditionally construct `expected input_shape`
         conv_output_channels = get_model_output_shape(self.pretrained_conv_net, (1, 3, 224, 224))[1]
+
+        # Remove VGG classification layers
+        self.pretrained_conv_net = self.pretrained_conv_net.features
 
         self.additional_layers = nn.Sequential(
             nn.Conv2d(conv_output_channels, output_channels, 1),  # First 1x1 convolution
