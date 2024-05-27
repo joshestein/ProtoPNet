@@ -9,7 +9,7 @@ class CUBDataset(Dataset):
     def __init__(self, data_dir: Path, train: bool, transform: Callable | None = None):
         super().__init__()
         image_path = "train_cropped_augmented" if train else "test_cropped"
-        self.image_paths = [p for p in Path.iterdir(data_dir / image_path) if p.is_file()]
+        self.image_paths = [p for p in (data_dir / image_path).rglob("*.jpg")]
         self.transform = transform
 
     def __len__(self):
