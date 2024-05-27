@@ -47,6 +47,8 @@ def crop_images(train_ids: list[int], data_dir: Path, output_dir: Path):
             image = image.crop((x, y, x + width, y + height))
 
             path = train_cropped_dir if image_id in train_ids else test_cropped_dir
+            path = path / image_paths[image_id].parent  # Folder for class
+            os.makedirs(path, exist_ok=True)
             image.save(path / image_paths[image_id].name)
 
 
