@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch import nn
+from torchvision.models import VGG16_Weights
 
 
 def get_model_output_shape(model, expected_input_shape):
@@ -15,8 +16,10 @@ class ProtoPNet(nn.Module):
         """
         super().__init__()
 
-        self.pretrained_conv_net = torch.hub.load("pytorch/vision:v0.10.0", base_model, pretrained=True)
         del self.pretrained_conv_net.classifier  # Remove classification layers
+        self.pretrained_conv_net = torch.hub.load(
+            "pytorch/vision:v0.10.0", base_model, weights=VGG16_Weights.IMAGENET1K_V1
+        )
 
         # TODO: support other base models, conditionally construct `expected input_shape`
         conv_output_channels = get_model_output_shape(self.pretrained_conv_net, (1, 3, 224, 224))[1]
