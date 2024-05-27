@@ -69,3 +69,42 @@ class ProtoPNet(nn.Module):
     def prototype_activations(self, distances, epsilon=0.001):
         distances = distances.view(-1, self.prototypes.shape[0])
         return torch.log((distances + 1) / (distances + epsilon))
+
+    def warm(self):
+        """Warm up. The pretrained network is frozen, and only train _all_ the additional prototype layers."""
+        for param in self.pretrained_conv_net.parameters():
+            param.requires_grad = False
+
+        for param in self.additional_layers.parameters():
+            param.requires_grad = True
+
+        self.prototypes.requires_grad = True
+
+        for param in self.fully_connected.parameters():
+            param.requires_grad = True
+
+    def all_layers_joint_learning(self):
+        """Learning all the layers together, including the pre-trained network layers."""
+        for param in self.pretrained_conv_net.parameters():
+            param.requires_grad = True
+
+        for param in self.additional_layers.parameters():
+            param.requires_grad = True
+
+        self.prototypes.requires_grad = True
+
+        for param in self.fully_connected.parameters():
+            param.requires_grad = True
+
+    def convex_optimisation_last_layer(self):
+        """Only optimising the last layer."""
+        for param in self.pretrained_conv_net.parameters():
+            param.requires_grad = False
+
+        for param in self.additional_layers.parameters():
+            param.requires_grad = False
+
+        self.prototypes.requires_grad = False
+
+        for param in self.fully_connected.parameters():
+            param.requires_grad = True
