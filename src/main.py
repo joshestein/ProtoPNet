@@ -4,12 +4,12 @@ import torch.optim
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from src.config import NUM_TRAINING_EPOCHS
+from src.config import CONVEX_OPTIMISATION_STEPS, NUM_TRAINING_EPOCHS, NUM_WARM_EPOCHS
 from src.data.cub_dataset import CUBDataset
 from src.protopnet import ProtoPNet
 
 
-def train(model: torch.nn.Module, dataloader: DataLoader):
+def train(model: torch.nn.Module, dataloader: DataLoader, optimiser: torch.optim.Optimizer):
     pass
 
 
@@ -41,9 +41,33 @@ def main():
     test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
     train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True)
     test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True)
+    warm_optimiser = torch.optim.Adam(
+        [
+            {"params": model.additional_layers.parameters(), "lr": 3e-3, "weight_decay": 1e-3},
+            {"params": model.prototypes, "lr": 3e-3},
+        ]
+    )
+    joint_optimiser = torch.optim.Adam(
+        [
+            {"params": model.pretrained_conv_net.parameters(), "lr": 1e-4, "weight_decay": 1e-3},
+            {"params": model.additional_layers.parameters(), "lr": 3e-3, "weight_decay": 1e-3},
+            {"params": model.prototypes, "lr": 3e-3},
+        ]
+    )
+    last_layer_optimiser = torch.optim.Adam([{"params": model.fully_connected.parameters(), "lr": 1e-4}])
 
-    for i in range(NUM_TRAINING_EPOCHS):
-        train(model, train_dataloader)
+    for epoch in range(NUM_TRAINING_EPOCHS):
+
+        if epoch < NUM_WARM_EPOCHS:
+            model.warm()
+            train(model, train_dataloader, optimiser=warm_optimiser)
+        else:
+            model.all_layers_joint_learning()
+            train(model, train_dataloader, optimiser=joint_optimiser)
+
+        for _step in CONVEX_OPTIMISATION_STEPS:
+            model.convex_optimisation_last_layer()
+            train(model, train_dataloader, optimiser=last_layer_optimiser)
 
 
 if __name__ == "__main__":
