@@ -17,12 +17,16 @@ class CUBDataset(Dataset):
 
     def __getitem__(self, index):
         image = self.image_paths[index]
-        # TODO: make a PR to allow `read_image` to take a Path!
 
+        # -1 since we are zero-indexed but the image names start from 1
+        # Each image name is something like <001>.<Bird name>.jpg
+        label = int(image.name.split(".")[0]) - 1
+
+        # TODO: make a PR to allow `read_image` to take a Path!
         # Open with PIL to allow `transforms.ToTensor` to succeed correctly
         image = Image.open(image)
 
         if self.transform:
             image = self.transform(image)
 
-        return image
+        return image, label
