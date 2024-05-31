@@ -44,14 +44,14 @@ class ProtoPLoss(torch.nn.Module):
         return loss
 
     def _calculate_cluster_cost(self, max_distance: Tensor, min_distances: Tensor, target: Tensor):
-        prototype_for_class = self.model.prototype_onehot_class_representation[target]
+        prototype_for_class = torch.t(self.model.prototype_onehot_class_representation[:, target])
         inverted_distances_to_target_prototypes, _ = torch.max(
             (max_distance - min_distances) * prototype_for_class, dim=1
         )
         return torch.mean(max_distance - inverted_distances_to_target_prototypes)
 
     def _calculate_separation_cost(self, max_distance: Tensor, min_distances: Tensor, target: Tensor):
-        prototype_for_other_class = 1 - self.model.prototype_onehot_class_representation[target]
+        prototype_for_other_class = 1 - torch.t(self.model.prototype_onehot_class_representation[:, target])
         inverted_distances_to_nontarget_prototypes, _ = torch.max(
             (max_distance - min_distances) * prototype_for_other_class, dim=1
         )
