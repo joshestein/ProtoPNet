@@ -32,7 +32,7 @@ class ProtoPLoss(torch.nn.Module):
             target=target,
         )
 
-        # Convex optimization of the last layer
+        # Convex optimisation of the last layer
         l1_mask = 1 - torch.transpose(self.model.prototype_onehot_class_representation, 0, 1)
         l1 = (self.model.fully_connected.weight * l1_mask).norm(p=1)
 
