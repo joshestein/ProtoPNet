@@ -36,7 +36,9 @@ class ProtoPNet(nn.Module):
         prototype_shape = (self.num_prototypes, output_channels, 1, 1)
 
         # Each class has a onehot prototype representation
-        self.prototype_onehot_class_representation = torch.zeros((num_output_classes, self.num_prototypes))
+        self.prototype_onehot_class_representation = torch.zeros((self.num_prototypes, num_output_classes))
+        for i in range(self.num_prototypes):
+            self.prototype_onehot_class_representation[i, i // prototypes_per_class] = 1
 
         # TODO: Xavier initialisation
         self.prototypes = nn.Parameter(torch.randn(prototype_shape))
