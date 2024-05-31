@@ -53,9 +53,9 @@ class ProtoPNet(nn.Module):
         distances = self.prototype_distances(x)
         min_distances = -F.max_pool2d(-distances, kernel_size=(distances.size()[2], distances.size()[3]))
         min_distances = min_distances.view(-1, self.num_prototypes)
-        x = self.prototype_activations(distances)
-
+        x = self.prototype_activations(min_distances)
         x = self.fully_connected(x)
+
         return x, min_distances
 
     def prototype_distances(self, x):
@@ -68,8 +68,8 @@ class ProtoPNet(nn.Module):
         distances = F.relu(x2_convolved_patches + intermediate)
         return distances
 
-    def prototype_activations(self, distances, epsilon=0.001):
-        distances = distances.view(-1, self.prototypes.shape[0])
+    @staticmethod
+    def prototype_activations(distances, epsilon=0.001):
         return torch.log((distances + 1) / (distances + epsilon))
 
     def warm(self):
