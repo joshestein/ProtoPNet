@@ -16,8 +16,7 @@ class ProtoPLoss(torch.nn.Module):
         self.separation_cost_weight = separation_cost_weight
         self.l1_regularization_weight = l1_regularization_weight
 
-    def forward(self, batch_input: Tensor, target: Tensor):
-        output, min_distances = self.model(batch_input)
+    def forward(self, output: Tensor, target: Tensor, min_distances: torch.Tensor):
         max_distance = self.model.prototypes.shape[1] * self.model.prototypes.shape[2] * self.model.prototypes.shape[3]
 
         cross_entropy = self.cross_entropy(output, target)
