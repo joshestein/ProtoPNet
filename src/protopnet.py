@@ -32,16 +32,17 @@ class ProtoPNet(nn.Module):
             nn.Sigmoid(),
         )
 
+        self.num_output_classes = num_output_classes
         self.num_prototypes = prototypes_per_class * num_output_classes
-        prototype_shape = (self.num_prototypes, output_channels, 1, 1)
+        self.prototype_shape = (self.num_prototypes, output_channels, 1, 1)
 
         # Each class has a onehot prototype representation
         self.prototype_onehot_class_representation = torch.zeros((self.num_prototypes, num_output_classes))
         for i in range(self.num_prototypes):
             self.prototype_onehot_class_representation[i, i // prototypes_per_class] = 1
 
-        self.prototypes = nn.Parameter(torch.randn(prototype_shape))
-        self.ones = nn.Parameter(torch.ones(prototype_shape), requires_grad=False)
+        self.prototypes = nn.Parameter(torch.randn(self.prototype_shape))
+        self.ones = nn.Parameter(torch.ones(self.prototype_shape), requires_grad=False)
         self.fully_connected = nn.Linear(self.num_prototypes, num_output_classes, bias=False)
 
         self._initialise_weights()
