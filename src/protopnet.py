@@ -126,3 +126,9 @@ class ProtoPNet(nn.Module):
         positive_prototype_locations = torch.t(self.prototype_onehot_class_representation)
         negative_prototype_locations = 1 - positive_prototype_locations
         self.fully_connected.weight.data.copy_(1 * positive_prototype_locations + -0.5 * negative_prototype_locations)
+
+    def project(self, x):
+        x = self.pretrained_conv_net(x)
+        x = self.additional_layers(x)
+        distances = self.prototype_distances(x)
+        return x, distances
