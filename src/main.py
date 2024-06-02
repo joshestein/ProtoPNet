@@ -8,6 +8,7 @@ from src.config import CONVEX_OPTIMISATION_START_EPOCH, CONVEX_OPTIMISATION_STEP
 from src.data.cub_dataset import CUBDataset
 from src.loss import ProtoPLoss
 from src.protopnet import ProtoPNet
+from src.prototypes import project_prototypes
 
 
 def train(model: ProtoPNet, dataloader: DataLoader, loss_fn: ProtoPLoss, optimiser: torch.optim.Optimizer):
@@ -80,9 +81,11 @@ def main():
             model.all_layers_joint_learning()
             train(model, train_dataloader, loss_fn=loss, optimiser=joint_optimiser)
 
-        for _step in CONVEX_OPTIMISATION_STEPS:
+        if epoch > CONVEX_OPTIMISATION_START_EPOCH:
+            project_prototypes(model, train_dataloader)
             model.convex_optimisation_last_layer()
-            train(model, train_dataloader, optimiser=last_layer_optimiser)
+            for i in range(CONVEX_OPTIMISATION_STEPS):
+                train(model, train_dataloader, loss_fn=loss, optimiser=last_layer_optimiser)
 
 
 if __name__ == "__main__":
