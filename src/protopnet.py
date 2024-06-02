@@ -40,10 +40,11 @@ class ProtoPNet(nn.Module):
         for i in range(self.num_prototypes):
             self.prototype_onehot_class_representation[i, i // prototypes_per_class] = 1
 
-        # TODO: Xavier initialisation
         self.prototypes = nn.Parameter(torch.randn(prototype_shape))
         self.ones = nn.Parameter(torch.ones(prototype_shape), requires_grad=False)
         self.fully_connected = nn.Linear(self.num_prototypes, num_output_classes, bias=False)
+
+        self._initialise_weights()
 
     def forward(self, x):
         x = self.pretrained_conv_net(x)
@@ -110,3 +111,17 @@ class ProtoPNet(nn.Module):
 
         for param in self.fully_connected.parameters():
             param.requires_grad = True
+
+    def _initialise_weights(self):
+        """Kaiming initialisation of additional convolutional layers. The fully connected layer weights are
+        initialised to 1 if its output logit is connected to a prototype of the same class, otherwise -0.5."""
+        for layer in self.additional_layers.modules():
+            if isinstance(layer, nn.Conv2d):
+                nn.init.kaiming_normal_(layer.weight, mode="fan_out", nonlinearity="relu")
+
+                if layer.bias is not None:
+                    nn.init.constant_(layer.bias, 0)
+
+        positive_prototype_locations = torch.t(self.prototype_onehot_class_representation)
+        negative_prototype_locations = 1 - positive_prototype_locations
+        self.fully_connected.weight.data.copy_(1 * positive_prototype_locations + -0.5 * negative_prototype_locations)
