@@ -4,19 +4,34 @@ import torch.optim
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from src.config import CONVEX_OPTIMISATION_STEPS, NUM_TRAINING_EPOCHS, NUM_WARM_EPOCHS
+from src.config import CONVEX_OPTIMISATION_START_EPOCH, CONVEX_OPTIMISATION_STEPS, NUM_TRAINING_EPOCHS, NUM_WARM_EPOCHS
 from src.data.cub_dataset import CUBDataset
+from src.loss import ProtoPLoss
 from src.protopnet import ProtoPNet
 
 
-def train(model: torch.nn.Module, dataloader: DataLoader, optimiser: torch.optim.Optimizer):
-    pass
+def train(model: ProtoPNet, dataloader: DataLoader, loss_fn: ProtoPLoss, optimiser: torch.optim.Optimizer):
+    model.train()
+
+    for batch, (image, label) in enumerate(dataloader):
+        output, min_distances = model(image)
+
+        loss = loss_fn(output, label, min_distances)
+
+        optimiser.zero_grad()
+        loss.backward()
+        optimiser.step()
+
+        if batch % 100 == 0:
+            loss, current = loss.item(), (batch + 1) * len(image)
+            print(f"loss: {loss:>7f}  [{current:>5d}/{(len(dataloader)):>5d}]")
 
 
 def main():
     model = ProtoPNet()
     optimizer = torch.optim.Adam(params=model.parameters(), lr=1e-3)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 5, 0.1)
+    loss = ProtoPLoss(model)
 
     # TODO: augment online
     train_transforms = transforms.Compose(
@@ -60,10 +75,10 @@ def main():
 
         if epoch < NUM_WARM_EPOCHS:
             model.warm()
-            train(model, train_dataloader, optimiser=warm_optimiser)
+            train(model, train_dataloader, loss_fn=loss, optimiser=warm_optimiser)
         else:
             model.all_layers_joint_learning()
-            train(model, train_dataloader, optimiser=joint_optimiser)
+            train(model, train_dataloader, loss_fn=loss, optimiser=joint_optimiser)
 
         for _step in CONVEX_OPTIMISATION_STEPS:
             model.convex_optimisation_last_layer()
