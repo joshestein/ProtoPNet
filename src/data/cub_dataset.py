@@ -22,7 +22,6 @@ class CUBDataset(Dataset):
         # Each image name is something like <001>.<Bird name>.jpg
         label = int(image.name.split(".")[0]) - 1
 
-        # TODO: make a PR to allow `read_image` to take a Path!
         # Open with PIL to allow `transforms.ToTensor` to succeed correctly
         image = Image.open(image)
 
