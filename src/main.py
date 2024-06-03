@@ -57,6 +57,8 @@ def main():
     test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
     train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True)
     test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True)
+    model_dir = Path.cwd() / "models"
+
     warm_optimiser = torch.optim.Adam(
         [
             {"params": model.additional_layers.parameters(), "lr": 3e-3, "weight_decay": 1e-3},
@@ -86,6 +88,9 @@ def main():
             model.convex_optimisation_last_layer()
             for i in range(CONVEX_OPTIMISATION_STEPS):
                 train(model, train_dataloader, loss_fn=loss, optimiser=last_layer_optimiser)
+
+        if epoch % 10 == 0:
+            torch.save(model.state_dict(), model_dir / f"model_{epoch}.pt")
 
 
 if __name__ == "__main__":
