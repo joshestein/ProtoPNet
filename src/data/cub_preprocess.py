@@ -1,7 +1,6 @@
+import Augmentor
 import os
 from pathlib import Path
-
-import Augmentor
 from PIL import Image
 
 
@@ -64,28 +63,32 @@ def create_augmentations(root_dir: Path):
 
     os.makedirs(output_dir, exist_ok=True)
 
-    # Rotation
-    p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
-    p.rotate(probability=1, max_left_rotation=15, max_right_rotation=15)
-    p.flip_left_right(probability=0.5)
-    for i in range(10):
-        p.process()
-    del p
+    try:
+        # Rotation
+        p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
+        p.rotate(probability=1, max_left_rotation=15, max_right_rotation=15)
+        p.flip_left_right(probability=0.5)
+        for i in range(10):
+            p.process()
+        del p
 
-    # Skew
-    p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
-    p.skew(probability=1, magnitude=0.2)  # max 45 degrees
-    p.flip_left_right(probability=0.5)
-    for i in range(10):
-        p.process()
-    del p
+        # Skew
+        p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
+        p.skew(probability=1, magnitude=0.2)  # max 45 degrees
+        p.flip_left_right(probability=0.5)
+        for i in range(10):
+            p.process()
+        del p
 
-    # Shear
-    p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
-    p.shear(probability=1, max_shear_left=10, max_shear_right=10)
-    p.flip_left_right(probability=0.5)
-    for i in range(10):
-        p.process()
+        # Shear
+        p = Augmentor.Pipeline(source_directory=input_dir, output_directory=output_dir)
+        p.shear(probability=1, max_shear_left=10, max_shear_right=10)
+        p.flip_left_right(probability=0.5)
+        for i in range(10):
+            p.process()
+
+    except ValueError:
+        pass
 
 
 def run_preprocessing(data_dir: Path, output_dir: Path):
