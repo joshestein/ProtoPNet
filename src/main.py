@@ -52,7 +52,7 @@ def main():
         ]
     )
 
-    data_dir = Path.cwd() / "data" / "CUB-200-2011" / "CUB_200_2011" / "cub200_cropped"
+    data_dir = Path.cwd().parent / "data" / "CUB_200_2011" / "cub200_cropped"
     train_data = CUBDataset(data_dir, train=True, transform=train_transforms)
     test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
     train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True)
