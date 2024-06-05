@@ -5,3 +5,4 @@ torchvision~=0.18.0
 numpy~=1.26.4
 matplotlib~=3.9.0
 opencv-python~=4.10.0.82
+wandb~=0.17.0

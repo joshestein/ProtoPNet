@@ -1,4 +1,5 @@
 import torch.optim
+import wandb
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
@@ -31,6 +32,7 @@ def train(model: ProtoPNet, dataloader: DataLoader, loss_fn: ProtoPLoss, optimis
         if batch % 100 == 0:
             loss, current = loss.item(), (batch + 1) * len(image)
             print(f"loss: {loss:>7f}  [{current:>5d}/{(len(dataloader)):>5d}]")
+            wandb.log({"loss": loss})
 
 
 def main():
@@ -62,20 +64,54 @@ def main():
     # test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
     # test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True)
 
+    warm_lr = 3e-3
+    warm_weight_decay = 1e-3
+    warm_prototype_lr = 3e-3
     warm_optimiser = torch.optim.Adam(
         [
-            {"params": model.additional_layers.parameters(), "lr": 3e-3, "weight_decay": 1e-3},
-            {"params": model.prototypes, "lr": 3e-3},
+            {"params": model.additional_layers.parameters(), "lr": warm_lr, "weight_decay": warm_weight_decay},
+            {"params": model.prototypes, "lr": warm_prototype_lr},
         ]
     )
+
+    pretrained_lr = 1e-4
+    pretrained_weight_decay = 1e-3
+    joint_additional_layers_lr = 3e-3
+    joint_additional_layers_weight_decay = 1e-3
+    joint_prototype_lr = 3e-3
     joint_optimiser = torch.optim.Adam(
         [
-            {"params": model.pretrained_conv_net.parameters(), "lr": 1e-4, "weight_decay": 1e-3},
-            {"params": model.additional_layers.parameters(), "lr": 3e-3, "weight_decay": 1e-3},
-            {"params": model.prototypes, "lr": 3e-3},
+            {
+                "params": model.pretrained_conv_net.parameters(),
+                "lr": pretrained_lr,
+                "weight_decay": pretrained_weight_decay,
+            },
+            {
+                "params": model.additional_layers.parameters(),
+                "lr": joint_additional_layers_lr,
+                "weight_decay": joint_additional_layers_weight_decay,
+            },
+            {"params": model.prototypes, "lr": joint_prototype_lr},
         ]
     )
-    last_layer_optimiser = torch.optim.Adam([{"params": model.fully_connected.parameters(), "lr": 1e-4}])
+
+    last_layer_lr = 1e-4
+    last_layer_optimiser = torch.optim.Adam([{"params": model.fully_connected.parameters(), "lr": last_layer_lr}])
+
+    wandb.init(
+        project="protopnet",
+        config={
+            "warm_lr": warm_lr,
+            "warm_weight_decay": warm_weight_decay,
+            "warm_prototype_lr": warm_prototype_lr,
+            "pretrained_lr": pretrained_lr,
+            "pretrained_weight_decay": pretrained_weight_decay,
+            "joint_additional_layers_lr": joint_additional_layers_lr,
+            "joint_additional_layers_weight_decay": joint_additional_layers_weight_decay,
+            "joint_prototype_lr": joint_prototype_lr,
+            "last_layer_lr": last_layer_lr,
+        },
+    )
 
     for epoch in range(NUM_TRAINING_EPOCHS):
 
