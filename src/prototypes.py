@@ -8,8 +8,9 @@ from src.protopnet import ProtoPNet
 def project_prototypes(model: ProtoPNet, dataloader: DataLoader):
     """Project each prototype onto the nearest latent training patch for its corresponding class. See the training
     section (2.1) of the original paper."""
-    global_min_proto_dist = np.full(model.num_prototypes, np.inf)
-    global_min_fmap_patches = np.zeros((model.num_prototypes, *model.prototype_shape[1:]))
+
+    global_min_proto_dist = torch.full(model.num_prototypes, np.inf)
+    global_min_fmap_patches = torch.zeros((model.num_prototypes, *model.prototype_shape[1:]))
 
     prototype_shape = model.prototype_shape
     num_prototypes = model.num_prototypes
