@@ -1,6 +1,5 @@
-from pathlib import Path
-
 import torch.optim
+from pathlib import Path
 from torch.utils.data import DataLoader
 from torchvision import transforms
 

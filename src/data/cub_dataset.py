@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Callable
 
 from PIL import Image
 from torch.utils.data import Dataset
+from typing import Callable
 
 
 class CUBDataset(Dataset):
