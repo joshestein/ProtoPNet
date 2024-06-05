@@ -1,7 +1,9 @@
 import numpy as np
+import os
 import torch
 from torch.utils.data.dataloader import DataLoader
 
+from src.config import model_dir
 from src.protopnet import ProtoPNet
 
 
