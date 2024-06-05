@@ -24,16 +24,16 @@ def project_prototypes(model: ProtoPNet, dataloader: DataLoader):
 
         label_to_index_map = _build_label_to_index_map(label, model)
 
-        for j in range(num_prototypes):
-            target_class = torch.argmax(model.prototype_onehot_class_representation[j])
+        for prototype_index in range(num_prototypes):
+            target_class = torch.argmax(model.prototype_onehot_class_representation[prototype_index])
 
             # if len(label_to_index_map[target_class]) == 0:
             #     continue
             #
-            proto_dist_j = proto_dist[label_to_index_map[target_class]][:, j, :, :]
+            proto_dist_j = proto_dist[label_to_index_map[target_class]][:, prototype_index, :, :]
             batch_min_proto_dist_j = torch.amin(proto_dist_j)
 
-            if batch_min_proto_dist_j < global_min_proto_dist[j]:
+            if batch_min_proto_dist_j < global_min_proto_dist[prototype_index]:
                 batch_argmin_proto_dist_j = list(
                     np.unravel_index(np.argmin(proto_dist_j, axis=None), proto_dist_j.shape)
                 )
@@ -52,8 +52,8 @@ def project_prototypes(model: ProtoPNet, dataloader: DataLoader):
                     fmap_width_start_index:fmap_width_end_index,
                 ]
 
-                global_min_proto_dist[j] = batch_min_proto_dist_j
-                global_min_fmap_patches[j] = batch_min_fmap_patch_j
+                global_min_proto_dist[prototype_index] = batch_min_proto_dist_j
+                global_min_fmap_patches[prototype_index] = batch_min_fmap_patch_j
 
 
 def _build_label_to_index_map(label, model):
