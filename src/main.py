@@ -42,26 +42,25 @@ def main():
     train_transforms = transforms.Compose(
         [
             transforms.ToTensor(),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomAffine(degrees=15, shear=15),
             transforms.Resize((224, 224)),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
-    test_transforms = transforms.Compose(
-        [
-            transforms.ToTensor(),
-            transforms.Resize((224, 224)),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
+    # test_transforms = transforms.Compose(
+    #     [
+    #         transforms.ToTensor(),
+    #         transforms.Resize((224, 224)),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #     ]
+    # )
 
-    test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
     train_data = CUBDataset(data_dir, train=True, push=False, transform=train_transforms)
     train_push_data = CUBDataset(data_dir, train=True, push=True, transform=train_transforms)
     train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True)
-    test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True)
     train_push_dataloader = DataLoader(train_push_data, batch_size=2, shuffle=True)
+
+    # test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
+    # test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True)
 
     warm_optimiser = torch.optim.Adam(
         [
