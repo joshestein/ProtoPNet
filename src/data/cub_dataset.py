@@ -6,9 +6,12 @@ from typing import Callable
 
 
 class CUBDataset(Dataset):
-    def __init__(self, data_dir: Path, train: bool, transform: Callable | None = None):
+    def __init__(self, data_dir: Path, train: bool, push: bool, transform: Callable | None = None):
         super().__init__()
-        image_path = "train_cropped_augmented" if train else "test_cropped"
+        if train:
+            image_path = "train_cropped" if push else "train_cropped_augmented"
+        else:
+            image_path = "test_cropped"
         self.image_paths = [p for p in (data_dir / image_path).rglob("*.jpg")]
         self.transform = transform
 

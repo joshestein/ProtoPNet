@@ -52,11 +52,13 @@ def main():
     )
 
     data_dir = Path.cwd().parent / "data" / "CUB_200_2011" / "cub200_cropped"
-    train_data = CUBDataset(data_dir, train=True, transform=train_transforms)
     test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
+    train_data = CUBDataset(data_dir, train=True, push=False, transform=train_transforms)
+    train_push_data = CUBDataset(data_dir, train=True, push=True, transform=train_transforms)
     train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True)
     test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True)
     model_dir = Path.cwd() / "models"
+    train_push_dataloader = DataLoader(train_push_data, batch_size=2, shuffle=True)
 
     warm_optimiser = torch.optim.Adam(
         [
@@ -83,7 +85,7 @@ def main():
             train(model, train_dataloader, loss_fn=loss, optimiser=joint_optimiser)
 
         if epoch > CONVEX_OPTIMISATION_START_EPOCH:
-            project_prototypes(model, train_dataloader)
+            project_prototypes(model, train_push_dataloader, epoch)
             model.convex_optimisation_last_layer()
             for i in range(CONVEX_OPTIMISATION_STEPS):
                 train(model, train_dataloader, loss_fn=loss, optimiser=last_layer_optimiser)
