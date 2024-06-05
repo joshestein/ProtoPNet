@@ -39,7 +39,6 @@ def main():
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 5, 0.1)
     loss = ProtoPLoss(model)
 
-    # TODO: augment online
     train_transforms = transforms.Compose(
         [
             transforms.ToTensor(),
