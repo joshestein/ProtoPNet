@@ -1,9 +1,15 @@
 import torch.optim
-from pathlib import Path
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from src.config import CONVEX_OPTIMISATION_START_EPOCH, CONVEX_OPTIMISATION_STEPS, NUM_TRAINING_EPOCHS, NUM_WARM_EPOCHS
+from src.config import (
+    CONVEX_OPTIMISATION_START_EPOCH,
+    CONVEX_OPTIMISATION_STEPS,
+    data_dir,
+    model_dir,
+    NUM_TRAINING_EPOCHS,
+    NUM_WARM_EPOCHS,
+)
 from src.data.cub_dataset import CUBDataset
 from src.loss import ProtoPLoss
 from src.protopnet import ProtoPNet
@@ -51,13 +57,11 @@ def main():
         ]
     )
 
-    data_dir = Path.cwd().parent / "data" / "CUB_200_2011" / "cub200_cropped"
     test_data = CUBDataset(data_dir, train=False, transform=test_transforms)
     train_data = CUBDataset(data_dir, train=True, push=False, transform=train_transforms)
     train_push_data = CUBDataset(data_dir, train=True, push=True, transform=train_transforms)
     train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True)
     test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True)
-    model_dir = Path.cwd() / "models"
     train_push_dataloader = DataLoader(train_push_data, batch_size=2, shuffle=True)
 
     warm_optimiser = torch.optim.Adam(
