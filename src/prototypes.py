@@ -30,7 +30,7 @@ def project_prototypes(model: ProtoPNet, dataloader: DataLoader, epoch: int):
         label_to_index_map = _build_label_to_index_map(label, model)
 
         for prototype_index in range(num_prototypes):
-            target_class = torch.argmax(model.prototype_onehot_class_representation[prototype_index])
+            target_class = torch.argmax(model.prototype_onehot_class_representation[prototype_index]).item()
 
             # if len(label_to_index_map[target_class]) == 0:
             #     continue
