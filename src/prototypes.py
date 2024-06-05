@@ -18,6 +18,9 @@ def project_prototypes(model: ProtoPNet, dataloader: DataLoader, epoch: int):
     proto_height = prototype_shape[2]
     proto_width = prototype_shape[3]
 
+    save_dir = model_dir / "images" / f"epoch-{epoch}"
+    os.makedirs(save_dir, exist_ok=True)
+
     for i, (image, label) in enumerate(dataloader):
         # TODO: check that image is normalised
 
