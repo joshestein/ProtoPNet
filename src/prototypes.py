@@ -32,9 +32,9 @@ def project_prototypes(model: ProtoPNet, dataloader: DataLoader, epoch: int):
         for prototype_index in range(num_prototypes):
             target_class = torch.argmax(model.prototype_onehot_class_representation[prototype_index]).item()
 
-            # if len(label_to_index_map[target_class]) == 0:
-            #     continue
-            #
+            if len(label_to_index_map[target_class]) == 0:
+                continue
+
             proto_dist_j = proto_dist[label_to_index_map[target_class]][:, prototype_index, :, :]
             batch_min_proto_dist_j = torch.amin(proto_dist_j)
 
