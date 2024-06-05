@@ -3,3 +3,5 @@ pillow~=10.3.0
 Augmentor~=0.2.12
 torchvision~=0.18.0
 numpy~=1.26.4
+matplotlib~=3.9.0
+opencv-python~=4.10.0.82
