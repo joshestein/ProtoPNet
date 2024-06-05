@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch import nn
-from torchvision.models import VGG16_Weights
+from torchvision.models import VGG19_Weights
 
 
 def get_model_output_shape(model, expected_input_shape):
@@ -9,7 +9,7 @@ def get_model_output_shape(model, expected_input_shape):
 
 
 class ProtoPNet(nn.Module):
-    def __init__(self, base_model="vgg16", output_channels=128, prototypes_per_class=10, num_output_classes=200):
+    def __init__(self, base_model="vgg19", output_channels=128, prototypes_per_class=10, num_output_classes=200):
         """
         :param base_model: one of 'vgg16', 'vgg19'
         :param output_channels: one of 128, 256, 512
@@ -17,7 +17,7 @@ class ProtoPNet(nn.Module):
         super().__init__()
 
         self.pretrained_conv_net = torch.hub.load(
-            "pytorch/vision:v0.10.0", base_model, weights=VGG16_Weights.IMAGENET1K_V1
+            "pytorch/vision:v0.10.0", base_model, weights=VGG19_Weights.IMAGENET1K_V1
         )
         # Remove VGG classification layers
         self.pretrained_conv_net = self.pretrained_conv_net.features
