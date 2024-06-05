@@ -26,7 +26,9 @@ class CUBDataset(Dataset):
         label = int(image.name.split(".")[0]) - 1
 
         # Open with PIL to allow `transforms.ToTensor` to succeed correctly
-        image = Image.open(image)
+        # Some of the images are grayscale (see 066.Western_Gull), so we convert
+        # to RGB
+        image = Image.open(image).convert("RGB")
 
         if self.transform:
             image = self.transform(image)
