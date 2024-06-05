@@ -23,7 +23,7 @@ class CUBDataset(Dataset):
 
         # -1 since we are zero-indexed but the image names start from 1
         # Each image name is something like <001>.<Bird name>.jpg
-        label = int(image.name.split(".")[0]) - 1
+        label = int(image.parent.name.split(".")[0]) - 1
 
         # Open with PIL to allow `transforms.ToTensor` to succeed correctly
         # Some of the images are grayscale (see 066.Western_Gull), so we convert
