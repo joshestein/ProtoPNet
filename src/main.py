@@ -86,13 +86,12 @@ def main():
             model.all_layers_joint_learning()
             train(model, train_dataloader, loss_fn=loss, optimiser=joint_optimiser)
 
-        if epoch > CONVEX_OPTIMISATION_START_EPOCH:
+        if epoch > CONVEX_OPTIMISATION_START_EPOCH and epoch % 10 == 0:
             project_prototypes(model, train_push_dataloader, epoch)
             model.convex_optimisation_last_layer()
             for i in range(CONVEX_OPTIMISATION_STEPS):
                 train(model, train_dataloader, loss_fn=loss, optimiser=last_layer_optimiser)
 
-        if epoch % 10 == 0:
             torch.save(model.state_dict(), model_dir / f"model_{epoch}.pt")
 
 
