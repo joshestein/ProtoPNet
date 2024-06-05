@@ -60,6 +60,14 @@ def project_prototypes(model: ProtoPNet, dataloader: DataLoader, epoch: int):
                 global_min_proto_dist[prototype_index] = batch_min_proto_dist_j
                 global_min_fmap_patches[prototype_index] = batch_min_fmap_patch_j
 
+    np.save(
+        save_dir / f"bb-receptive-field-epoch-{epoch}.npy",
+        proto_rf_boxes,
+    )
+    np.save(
+        save_dir / f"bb-epoch-{epoch}.npy",
+        proto_bound_boxes,
+    )
 
 def _build_label_to_index_map(label, model):
     label_to_index = {key: [] for key in range(model.num_output_classes)}
