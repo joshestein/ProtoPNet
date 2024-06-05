@@ -5,7 +5,7 @@ from torch.utils.data.dataloader import DataLoader
 from src.protopnet import ProtoPNet
 
 
-def project_prototypes(model: ProtoPNet, dataloader: DataLoader):
+def project_prototypes(model: ProtoPNet, dataloader: DataLoader, epoch: int):
     """Project each prototype onto the nearest latent training patch for its corresponding class. See the training
     section (2.1) of the original paper."""
 
