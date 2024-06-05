@@ -69,6 +69,11 @@ def project_prototypes(model: ProtoPNet, dataloader: DataLoader, epoch: int):
         proto_bound_boxes,
     )
 
+    prototype_update = torch.reshape(global_min_fmap_patches, tuple(prototype_shape))
+    # model.prototypes.data.copy_(torch.tensor(prototype_update, dtype=torch.float32))
+    model.prototypes.data = prototype_update.clone().detach().requires_grad_(True)
+
+
 def _build_label_to_index_map(label, model):
     label_to_index = {key: [] for key in range(model.num_output_classes)}
     for label_index, current_label in enumerate(label):
